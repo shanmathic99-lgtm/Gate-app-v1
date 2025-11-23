@@ -1,4 +1,4 @@
-import { X, Mail, Phone, Building2, User, Clock, CheckCircle, XCircle, Camera, Upload } from 'lucide-react';
+import { X, Mail, Phone, Building2, User, Clock, CheckCircle, XCircle, Camera, Upload, AlertTriangle } from 'lucide-react';
 import { Visitor } from '../types';
 import { useRef, useState } from 'react';
 
@@ -44,6 +44,8 @@ export const VisitorModal = ({ visitor, onClose, onCheckOut, onPhotoUpdate }: Vi
       default: return 'text-slate-600 bg-slate-50 border-slate-200';
     }
   };
+
+  const hasRejectedApprovals = visitor.approvals.some(a => a.status === 'rejected');
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -94,17 +96,21 @@ export const VisitorModal = ({ visitor, onClose, onCheckOut, onPhotoUpdate }: Vi
 
                 <div className="pt-4 border-t border-slate-200">
                   <span className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg border font-medium text-sm w-full justify-center ${
+                    hasRejectedApprovals ? 'bg-red-50 text-red-700 border-red-200' :
                     visitor.status === 'checked-in' ? 'bg-green-50 text-green-700 border-green-200' :
                     visitor.status === 'checked-out' ? 'bg-slate-50 text-slate-700 border-slate-200' :
                     'bg-amber-50 text-amber-700 border-amber-200'
                   }`}>
-                    {visitor.status === 'checked-in' && <CheckCircle className="w-4 h-4" />}
-                    {visitor.status === 'checked-out' && <XCircle className="w-4 h-4" />}
-                    <span className="capitalize">{visitor.status.replace('-', ' ')}</span>
+                    {hasRejectedApprovals && <X className="w-4 h-4" />}
+                    {!hasRejectedApprovals && visitor.status === 'checked-in' && <CheckCircle className="w-4 h-4" />}
+                    {!hasRejectedApprovals && visitor.status === 'checked-out' && <XCircle className="w-4 h-4" />}
+                    <span className="capitalize">
+                      {hasRejectedApprovals ? 'Rejected' : visitor.status.replace('-', ' ')}
+                    </span>
                   </span>
                 </div>
 
-                {visitor.status === 'checked-in' && (
+                {visitor.status === 'checked-in' && !hasRejectedApprovals && (
                   <button
                     onClick={() => {
                       onCheckOut(visitor.id);
@@ -114,6 +120,14 @@ export const VisitorModal = ({ visitor, onClose, onCheckOut, onPhotoUpdate }: Vi
                   >
                     Check Out Visitor
                   </button>
+                )}
+                
+                {hasRejectedApprovals && (
+                  <div className="w-full px-4 py-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-sm text-red-700 font-medium text-center">
+                      Check-in not allowed due to rejected approvals
+                    </p>
+                  </div>
                 )}
               </div>
             </div>
@@ -211,14 +225,26 @@ export const VisitorModal = ({ visitor, onClose, onCheckOut, onPhotoUpdate }: Vi
                   {visitor.approvals.map((approval) => (
                     <div
                       key={approval.id}
-                      className={`border rounded-lg p-4 ${getStatusColor(approval.status)}`}
+                      className={`border rounded-lg p-4 ${getStatusColor(approval.status)} ${
+                        approval.status === 'rejected' ? 'border-red-300 border-2' : ''
+                      }`}
                     >
                       <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <p className="font-semibold">{approval.approverName}</p>
-                          <p className="text-sm opacity-80">{approval.approverRole}</p>
+                        <div className="flex items-start gap-2">
+                          {approval.status === 'rejected' && (
+                            <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
+                          )}
+                          {approval.status === 'approved' && (
+                            <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                          )}
+                          <div>
+                            <p className="font-semibold">{approval.approverName}</p>
+                            <p className="text-sm opacity-80">{approval.approverRole}</p>
+                          </div>
                         </div>
-                        <span className="px-3 py-1 rounded-full text-xs font-bold uppercase border">
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase border ${
+                          approval.status === 'rejected' ? 'bg-red-200 border-red-400' : ''
+                        }`}>
                           {approval.status}
                         </span>
                       </div>
@@ -228,7 +254,11 @@ export const VisitorModal = ({ visitor, onClose, onCheckOut, onPhotoUpdate }: Vi
                         </p>
                       )}
                       {approval.comments && (
-                        <p className="text-sm mt-2 italic">"{approval.comments}"</p>
+                        <p className={`text-sm mt-2 ${
+                          approval.status === 'rejected' ? 'font-medium text-red-800' : 'italic'
+                        }`}>
+                          "{approval.comments}"
+                        </p>
                       )}
                     </div>
                   ))}

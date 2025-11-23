@@ -1,4 +1,4 @@
-import { Building2, Clock, User, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { Building2, Clock, User, CheckCircle, XCircle, AlertCircle, X } from 'lucide-react';
 import { Visitor } from '../types';
 
 interface VisitorCardProps {
@@ -36,7 +36,18 @@ export const VisitorCard = ({ visitor, onClick }: VisitorCardProps) => {
     }
   };
 
-  const statusConfig = getStatusConfig(visitor.status);
+  const hasRejectedApprovals = visitor.approvals.some(a => a.status === 'rejected');
+  
+  // Override status config if visitor has rejected approvals
+  const statusConfig = hasRejectedApprovals 
+    ? {
+        bg: 'bg-red-50',
+        text: 'text-red-700',
+        border: 'border-red-200',
+        icon: X,
+        label: 'Rejected'
+      }
+    : getStatusConfig(visitor.status);
   const StatusIcon = statusConfig.icon;
 
   const getCategoryColor = (category: Visitor['category']) => {
@@ -59,7 +70,7 @@ export const VisitorCard = ({ visitor, onClick }: VisitorCardProps) => {
   return (
     <div
       onClick={onClick}
-      className="p-6 hover:bg-slate-50 cursor-pointer transition-colors"
+      className="p-6 hover:bg-slate-50 cursor-pointer transition-colors relative"
     >
       <div className="flex flex-col lg:flex-row lg:items-center gap-4">
         <div className="flex items-center gap-4 flex-1">

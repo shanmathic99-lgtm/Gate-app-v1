@@ -15,6 +15,7 @@ export const generateMockVisitors = (date: Date): Visitor[] => {
       hostName: 'Sarah Williams',
       hostDepartment: 'IT Operations',
       checkInTime: `${dateStr}T09:15:00`,
+      accessEndTime: `${dateStr}T18:00:00`,
       status: 'checked-in',
       approvals: [
         {
@@ -47,6 +48,7 @@ export const generateMockVisitors = (date: Date): Visitor[] => {
       hostDepartment: 'Marketing',
       checkInTime: `${dateStr}T10:30:00`,
       checkOutTime: `${dateStr}T12:00:00`,
+      accessEndTime: `${dateStr}T12:00:00`,
       status: 'checked-out',
       approvals: [
         {
@@ -69,6 +71,7 @@ export const generateMockVisitors = (date: Date): Visitor[] => {
       hostName: 'Jennifer Lee',
       hostDepartment: 'Human Resources',
       checkInTime: `${dateStr}T14:00:00`,
+      accessEndTime: `${dateStr}T17:00:00`,
       status: 'checked-in',
       approvals: [
         {
@@ -82,8 +85,9 @@ export const generateMockVisitors = (date: Date): Visitor[] => {
           id: '5',
           approverName: 'Alex Kumar',
           approverRole: 'Engineering Lead',
-          status: 'approved',
-          timestamp: `${dateStr}T13:35:00`
+          status: 'rejected',
+          timestamp: `${dateStr}T13:35:00`,
+          comments: 'Candidate does not meet the required qualifications'
         }
       ]
     },
@@ -99,6 +103,7 @@ export const generateMockVisitors = (date: Date): Visitor[] => {
       hostDepartment: 'Facilities',
       checkInTime: `${dateStr}T11:00:00`,
       checkOutTime: `${dateStr}T11:20:00`,
+      accessEndTime: `${dateStr}T11:30:00`,
       status: 'checked-out',
       approvals: [
         {
@@ -121,6 +126,7 @@ export const generateMockVisitors = (date: Date): Visitor[] => {
       hostName: 'Catherine Moore',
       hostDepartment: 'Executive Office',
       checkInTime: `${dateStr}T15:30:00`,
+      accessEndTime: `${dateStr}T17:30:00`,
       status: 'scheduled',
       approvals: [
         {

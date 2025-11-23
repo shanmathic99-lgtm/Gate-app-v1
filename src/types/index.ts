@@ -10,6 +10,7 @@ export interface Visitor {
   hostDepartment: string;
   checkInTime: string;
   checkOutTime?: string;
+  accessEndTime?: string;
   photo?: string;
   status: 'checked-in' | 'checked-out' | 'scheduled';
   approvals: Approval[];

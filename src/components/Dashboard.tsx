@@ -1,16 +1,19 @@
 import { useState, useEffect } from 'react';
-import { Calendar, LogOut, Users, UserCheck, UserX, Clock } from 'lucide-react';
+import { Calendar, LogOut, Users, UserCheck, UserX, Clock, QrCode } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Visitor } from '../types';
 import { generateMockVisitors } from '../utils/mockData';
 import { VisitorList } from './VisitorList';
 import { VisitorModal } from './VisitorModal';
+import { QRScanner } from './QRScanner';
 
 export const Dashboard = () => {
   const { user, logout } = useAuth();
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   const [selectedVisitor, setSelectedVisitor] = useState<Visitor | null>(null);
+  const [showQRScanner, setShowQRScanner] = useState(false);
+  const [qrError, setQrError] = useState<string>('');
 
   useEffect(() => {
     const date = new Date(selectedDate);
@@ -36,6 +39,45 @@ export const Dashboard = () => {
     setVisitors(prev => prev.map(v =>
       v.id === visitorId ? { ...v, photo } : v
     ));
+  };
+
+  const findVisitorById = (visitorId: string): Visitor | null => {
+    // Search in current date's visitors first
+    const currentVisitor = visitors.find(v => v.id === visitorId);
+    if (currentVisitor) {
+      return currentVisitor;
+    }
+
+    // If not found, search in other dates (last 7 days)
+    for (let i = 1; i <= 7; i++) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      const dateStr = date.toISOString().split('T')[0];
+      const pastVisitors = generateMockVisitors(date);
+      const found = pastVisitors.find(v => v.id === visitorId);
+      if (found) {
+        return found;
+      }
+    }
+
+    return null;
+  };
+
+  const handleQRScanSuccess = (scannedData: string) => {
+    setQrError('');
+    setShowQRScanner(false);
+
+    // Try to parse the scanned data as visitor ID
+    // QR code should contain visitor ID (e.g., "2024-11-22-001")
+    const visitor = findVisitorById(scannedData);
+
+    if (visitor) {
+      setSelectedVisitor(visitor);
+    } else {
+      setQrError(`Visitor with ID "${scannedData}" not found. Please check the QR code.`);
+      // Show error for 3 seconds
+      setTimeout(() => setQrError(''), 3000);
+    }
   };
 
   return (
@@ -70,20 +112,36 @@ export const Dashboard = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {qrError && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700">
+            <p className="text-sm">{qrError}</p>
+          </div>
+        )}
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
             <div>
               <h2 className="text-xl font-semibold text-slate-800">Daily Visitor Log</h2>
               <p className="text-sm text-slate-600 mt-1">Track all visitors by date</p>
             </div>
-            <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-lg shadow-sm border border-slate-200">
-              <Calendar className="w-5 h-5 text-slate-600" />
-              <input
-                type="date"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-                className="outline-none text-slate-700 font-medium"
-              />
+            <div className="flex items-center gap-3">
+              {user?.role === 'security' && (
+                <button
+                  onClick={() => setShowQRScanner(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm transition font-medium"
+                >
+                  <QrCode className="w-5 h-5" />
+                  <span>Scan QR</span>
+                </button>
+              )}
+              <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-lg shadow-sm border border-slate-200">
+                <Calendar className="w-5 h-5 text-slate-600" />
+                <input
+                  type="date"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  className="outline-none text-slate-700 font-medium"
+                />
+              </div>
             </div>
           </div>
 
@@ -142,6 +200,13 @@ export const Dashboard = () => {
           onClose={() => setSelectedVisitor(null)}
           onCheckOut={handleCheckOut}
           onPhotoUpdate={handlePhotoUpdate}
+        />
+      )}
+
+      {showQRScanner && (
+        <QRScanner
+          onScanSuccess={handleQRScanSuccess}
+          onClose={() => setShowQRScanner(false)}
         />
       )}
     </div>

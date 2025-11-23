@@ -24,8 +24,17 @@ export const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div 
+      className="min-h-screen flex items-center justify-center p-4 relative"
+      style={{
+        backgroundImage: 'url(https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      <div className="absolute inset-0 bg-slate-900/70"></div>
+      <div className="w-full max-w-md relative z-10">
         <div className="bg-white rounded-2xl shadow-2xl p-8">
           <div className="flex justify-center mb-6">
             <div className="bg-blue-600 p-4 rounded-full">
@@ -34,7 +43,7 @@ export const LoginPage = () => {
           </div>
 
           <h1 className="text-3xl font-bold text-center text-slate-800 mb-2">
-            Visitor Management
+            Gate App
           </h1>
           <p className="text-center text-slate-600 mb-8">
             Secure Access Control System
@@ -83,20 +92,6 @@ export const LoginPage = () => {
               Sign In
             </button>
           </form>
-
-          <div className="mt-8 pt-6 border-t border-slate-200">
-            <p className="text-xs text-slate-500 text-center mb-3">Demo Credentials:</p>
-            <div className="grid grid-cols-2 gap-3 text-xs">
-              <div className="bg-slate-50 p-3 rounded-lg">
-                <p className="font-semibold text-slate-700">Admin</p>
-                <p className="text-slate-600">admin / admin123</p>
-              </div>
-              <div className="bg-slate-50 p-3 rounded-lg">
-                <p className="font-semibold text-slate-700">Security</p>
-                <p className="text-slate-600">security / security123</p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>

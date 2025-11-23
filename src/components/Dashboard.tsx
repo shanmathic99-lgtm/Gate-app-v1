@@ -48,7 +48,7 @@ export const Dashboard = () => {
                 <Users className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-slate-800">Visitor Management</h1>
+                <h1 className="text-2xl font-bold text-slate-800">Gate App</h1>
                 <p className="text-sm text-slate-600">Monitor and manage facility access</p>
               </div>
             </div>
@@ -87,44 +87,44 @@ export const Dashboard = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <div className="bg-white rounded-lg p-6 shadow-sm border border-slate-200">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
+            <div className="bg-white rounded-lg p-4 sm:p-6 shadow-sm border border-slate-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-slate-600 mb-1">Total Visitors</p>
-                  <p className="text-3xl font-bold text-slate-800">{stats.total}</p>
+                  <p className="text-xs sm:text-sm text-slate-600 mb-1">Total Visitors</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-slate-800">{stats.total}</p>
                 </div>
-                <Users className="w-10 h-10 text-blue-600" />
+                <Users className="w-8 h-8 sm:w-10 sm:h-10 text-blue-600" />
               </div>
             </div>
 
-            <div className="bg-white rounded-lg p-6 shadow-sm border border-slate-200">
+            <div className="bg-white rounded-lg p-4 sm:p-6 shadow-sm border border-slate-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-slate-600 mb-1">Checked In</p>
-                  <p className="text-3xl font-bold text-green-600">{stats.checkedIn}</p>
+                  <p className="text-xs sm:text-sm text-slate-600 mb-1">Checked In</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-green-600">{stats.checkedIn}</p>
                 </div>
-                <UserCheck className="w-10 h-10 text-green-600" />
+                <UserCheck className="w-8 h-8 sm:w-10 sm:h-10 text-green-600" />
               </div>
             </div>
 
-            <div className="bg-white rounded-lg p-6 shadow-sm border border-slate-200">
+            <div className="bg-white rounded-lg p-4 sm:p-6 shadow-sm border border-slate-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-slate-600 mb-1">Checked Out</p>
-                  <p className="text-3xl font-bold text-slate-600">{stats.checkedOut}</p>
+                  <p className="text-xs sm:text-sm text-slate-600 mb-1">Checked Out</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-slate-600">{stats.checkedOut}</p>
                 </div>
-                <UserX className="w-10 h-10 text-slate-600" />
+                <UserX className="w-8 h-8 sm:w-10 sm:h-10 text-slate-600" />
               </div>
             </div>
 
-            <div className="bg-white rounded-lg p-6 shadow-sm border border-slate-200">
+            <div className="bg-white rounded-lg p-4 sm:p-6 shadow-sm border border-slate-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-slate-600 mb-1">Scheduled</p>
-                  <p className="text-3xl font-bold text-amber-600">{stats.scheduled}</p>
+                  <p className="text-xs sm:text-sm text-slate-600 mb-1">Scheduled</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-amber-600">{stats.scheduled}</p>
                 </div>
-                <Clock className="w-10 h-10 text-amber-600" />
+                <Clock className="w-8 h-8 sm:w-10 sm:h-10 text-amber-600" />
               </div>
             </div>
           </div>

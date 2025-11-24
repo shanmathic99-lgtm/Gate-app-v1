@@ -26,14 +26,21 @@ export const VisitorModal = ({ visitor, onClose, onCheckOut, onPhotoUpdate }: Vi
     }
   };
 
-  const formatTime = (timeStr: string) => {
-    return new Date(timeStr).toLocaleString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
+  const formatTime = (timeStr: string | undefined | null) => {
+    try {
+      if (!timeStr) return 'N/A';
+      const date = new Date(timeStr);
+      if (isNaN(date.getTime())) return 'N/A';
+      return date.toLocaleString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      });
+    } catch (e) {
+      return 'N/A';
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -45,7 +52,12 @@ export const VisitorModal = ({ visitor, onClose, onCheckOut, onPhotoUpdate }: Vi
     }
   };
 
-  const hasRejectedApprovals = visitor.approvals.some(a => a.status === 'rejected');
+  const hasRejectedApprovals = visitor.approvals?.some(a => a.status === 'rejected') || false;
+
+  // Safety check - if visitor is invalid, don't render
+  if (!visitor || !visitor.id) {
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -178,6 +190,11 @@ export const VisitorModal = ({ visitor, onClose, onCheckOut, onPhotoUpdate }: Vi
                     }`}>
                       {visitor.category}
                     </span>
+                    {visitor.subcategory && (
+                      <span className="ml-2 inline-block px-2 py-1 bg-slate-100 text-slate-700 rounded text-sm">
+                        {visitor.subcategory}
+                      </span>
+                    )}
                   </div>
                   <div>
                     <label className="text-sm text-slate-600 mb-1 block">Purpose of Visit</label>
@@ -214,15 +231,183 @@ export const VisitorModal = ({ visitor, onClose, onCheckOut, onPhotoUpdate }: Vi
                       </div>
                     )}
                   </div>
+                  {visitor.empId && (
+                    <div>
+                      <label className="text-sm text-slate-600 mb-1 block">Employee ID</label>
+                      <p className="font-medium text-slate-800">{visitor.empId}</p>
+                    </div>
+                  )}
+                  {visitor.buildingNumber && (
+                    <div>
+                      <label className="text-sm text-slate-600 mb-1 block">Building Number</label>
+                      <p className="font-medium text-slate-800">{visitor.buildingNumber}</p>
+                    </div>
+                  )}
+                  {visitor.visitDate && (
+                    <div>
+                      <label className="text-sm text-slate-600 mb-1 block">Visit Date</label>
+                      <p className="font-medium text-slate-800">{visitor.visitDate}</p>
+                    </div>
+                  )}
                 </div>
               </div>
+
+              {/* API-specific fields */}
+              {(visitor.deliveryManagerEmail || visitor.approvalEmail || visitor.aadharCard || visitor.metadataJson || visitor.createdAt || visitor.approvedAt || (visitor as any).visitorGender || (visitor as any).visitorRelationship) && (
+                <div className="bg-white border border-slate-200 rounded-xl p-6">
+                  <h3 className="text-lg font-semibold text-slate-800 mb-4">Additional Information</h3>
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    {visitor.deliveryManagerEmail && (
+                      <div>
+                        <label className="text-sm text-slate-600 mb-1 block">Delivery Manager Email</label>
+                        <div className="flex items-center gap-2">
+                          <Mail className="w-4 h-4 text-slate-500" />
+                          <p className="font-medium text-slate-800">{visitor.deliveryManagerEmail}</p>
+                        </div>
+                      </div>
+                    )}
+                    {visitor.approvalEmail && (
+                      <div>
+                        <label className="text-sm text-slate-600 mb-1 block">Approval Email</label>
+                        <div className="flex items-center gap-2">
+                          <Mail className="w-4 h-4 text-slate-500" />
+                          <p className="font-medium text-slate-800">{visitor.approvalEmail}</p>
+                        </div>
+                      </div>
+                    )}
+                    {(visitor as any).vendorName && (
+                      <div>
+                        <label className="text-sm text-slate-600 mb-1 block">Vendor Name</label>
+                        <p className="font-medium text-slate-800">{(visitor as any).vendorName}</p>
+                      </div>
+                    )}
+                    {(visitor as any).vendorAddress && (
+                      <div>
+                        <label className="text-sm text-slate-600 mb-1 block">Vendor Address</label>
+                        <p className="font-medium text-slate-800">{(visitor as any).vendorAddress}</p>
+                      </div>
+                    )}
+                    {(visitor as any).companyContact && (
+                      <div>
+                        <label className="text-sm text-slate-600 mb-1 block">Company Contact</label>
+                        <p className="font-medium text-slate-800">{(visitor as any).companyContact}</p>
+                      </div>
+                    )}
+                    {(visitor as any).requestedAt && (
+                      <div>
+                        <label className="text-sm text-slate-600 mb-1 block">Requested At</label>
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-4 h-4 text-slate-500" />
+                          <p className="font-medium text-slate-800">{formatTime((visitor as any).requestedAt)}</p>
+                        </div>
+                      </div>
+                    )}
+                    {(visitor as any).document && (
+                      <div>
+                        <label className="text-sm text-slate-600 mb-1 block">Document</label>
+                        <a 
+                          href={(visitor as any).document} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-800 underline"
+                        >
+                          View Document
+                        </a>
+                      </div>
+                    )}
+                    {(visitor as any).visitorGender && (
+                      <div>
+                        <label className="text-sm text-slate-600 mb-1 block">Gender</label>
+                        <p className="font-medium text-slate-800">{(visitor as any).visitorGender}</p>
+                      </div>
+                    )}
+                    {(visitor as any).visitorRelationship && (
+                      <div>
+                        <label className="text-sm text-slate-600 mb-1 block">Relationship</label>
+                        <p className="font-medium text-slate-800">{(visitor as any).visitorRelationship}</p>
+                      </div>
+                    )}
+                    {visitor.aadharCard && (
+                      <div>
+                        <label className="text-sm text-slate-600 mb-1 block">Aadhar Card</label>
+                        <p className="font-medium text-slate-800">{visitor.aadharCard}</p>
+                      </div>
+                    )}
+                    {visitor.createdAt && (
+                      <div>
+                        <label className="text-sm text-slate-600 mb-1 block">Created At</label>
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-4 h-4 text-slate-500" />
+                          <p className="font-medium text-slate-800">{formatTime(visitor.createdAt)}</p>
+                        </div>
+                      </div>
+                    )}
+                    {visitor.approvedAt && (
+                      <div>
+                        <label className="text-sm text-slate-600 mb-1 block">Approved At</label>
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-4 h-4 text-slate-500" />
+                          <p className="font-medium text-slate-800">{formatTime(visitor.approvedAt)}</p>
+                        </div>
+                      </div>
+                    )}
+                    {visitor.approvalStatus && (
+                      <div>
+                        <label className="text-sm text-slate-600 mb-1 block">Approval Status</label>
+                        <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
+                          visitor.approvalStatus === 'APPROVED' ? 'bg-green-100 text-green-800' :
+                          visitor.approvalStatus === 'PENDING' ? 'bg-amber-100 text-amber-800' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {visitor.approvalStatus}
+                        </span>
+                      </div>
+                    )}
+                    {visitor.metadataJson && (
+                      <div className="sm:col-span-2">
+                        <label className="text-sm text-slate-600 mb-1 block">Metadata</label>
+                        <pre className="bg-slate-50 p-3 rounded-lg text-sm text-slate-800 overflow-x-auto">
+                          {JSON.stringify(visitor.metadataJson, null, 2)}
+                        </pre>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Grouped Visitors (for vendor and family visits) */}
+              {(visitor as any).groupedVisitors && (visitor as any).groupedVisitors.length > 0 && (
+                <div className="bg-white border border-slate-200 rounded-xl p-6">
+                  <h3 className="text-lg font-semibold text-slate-800 mb-4">
+                    {(visitor as any).apiType === 'hk02' ? 'Family Members' : 'Visitors'}
+                  </h3>
+                  <div className="space-y-4">
+                    {(visitor as any).groupedVisitors.map((grouped: any, idx: number) => (
+                      <div key={idx} className="border border-slate-200 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-semibold text-slate-800">{grouped.visitorName}</h4>
+                          {grouped.relationship && (
+                            <span className="px-2 py-1 bg-slate-100 text-slate-700 rounded text-xs">
+                              {grouped.relationship}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-slate-600 mb-2">{grouped.purposeOfVisit || 'N/A'}</p>
+                        <p className="text-xs text-slate-500">
+                          Visit Date: {formatTime(grouped.visitDate || grouped.visitDate)}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div className="bg-white border border-slate-200 rounded-xl p-6">
                 <h3 className="text-lg font-semibold text-slate-800 mb-4">
                   Approvals Required ({visitor.category})
                 </h3>
                 <div className="space-y-3">
-                  {visitor.approvals.map((approval) => (
+                  {(visitor.approvals || []).map((approval) => (
                     <div
                       key={approval.id}
                       className={`border rounded-lg p-4 ${getStatusColor(approval.status)} ${
